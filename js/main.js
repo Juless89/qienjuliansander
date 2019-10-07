@@ -20,30 +20,65 @@ function generate_table(dict) {
     $('#tableDiv').html(table_body);
 }
 
-function get_ticker(dict) {
-    const url = "https://api.binance.com/api/v1/ticker/24hr?symbol=";
-    const tickers = Object.keys(dict);
+let coins = {
+    BTC:"",
+    LTC:"",
+    ETH:"",
+}
 
-    for (var index in tickers) {
-        const tick = tickers[index];
-        const request = url + tick;
+class Exchange {
+    constructor(url, coins){
+        this.url = url;
+        this.coins = coins;
+    }
 
-        fetch(request).then(response => response.json())
-            .then(data => {
-            dict[data.symbol] = data.lastPrice;
-            generate_table(dict);
-        }).catch(error => console.error(error))
+    ticker(coin) {
+        if (coin === "BTC") {
+            return "BTCUSDT"
+        } else if (coin === "LTC") {
+            return "LTCUSDT"
+        } else if (coin === "ETH") {
+            return "ETHUSDT"
+        }
+    }
+
+    construct_query(coin) {
+        const tick = this.ticker(coin);
+
+        return this.url + tick;
+    }
+
+    process_data(coin, data) {
+        this.coins[coin] = data.lastPrice;
+    }
+
+    get_price() {
+        const coins = Object.keys(this.coins);
+    
+        for (var index in coins) {
+            const coin = coins[index]
+
+            const request = this.construct_query(coin);
+    
+            fetch(request).then(response => response.json())
+                .then(data => {
+                this.process_data(coin, data);
+                console.log(data);
+            }).catch(error => console.error(error))
+        }
     }
 }
 
-let dict = {
-    BTCUSDT:"",
-    LTCUSDT:"",
-    ETHUSDT:"",
-}
+const binance = new Exchange("https://api.binance.com/api/v1/ticker/24hr?symbol=", coins);
 
 setInterval(
     () => {
-        get_ticker(dict);
+        binance.get_price();
+    },1000
+);
+
+setInterval(
+    () => {
+        generate_table(coins);
     },1000
 );
