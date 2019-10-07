@@ -21,35 +21,15 @@ function generate_table(dict) {
 }
 
 let coins = {
-    BTC:"",
-    LTC:"",
-    ETH:"",
+    BTC: {},
+    LTC: {},
+    ETH: {},
 }
 
 class Exchange {
     constructor(url, coins){
         this.url = url;
         this.coins = coins;
-    }
-
-    ticker(coin) {
-        if (coin === "BTC") {
-            return "BTCUSDT"
-        } else if (coin === "LTC") {
-            return "LTCUSDT"
-        } else if (coin === "ETH") {
-            return "ETHUSDT"
-        }
-    }
-
-    construct_query(coin) {
-        const tick = this.ticker(coin);
-
-        return this.url + tick;
-    }
-
-    process_data(coin, data) {
-        this.coins[coin] = data.lastPrice;
     }
 
     get_price() {
@@ -63,22 +43,74 @@ class Exchange {
             fetch(request).then(response => response.json())
                 .then(data => {
                 this.process_data(coin, data);
-                console.log(data);
+                //console.log(data);
             }).catch(error => console.error(error))
         }
     }
 }
 
-const binance = new Exchange("https://api.binance.com/api/v1/ticker/24hr?symbol=", coins);
+class Binance extends Exchange {
+    construct_query(coin) {
+        const tick = this.ticker(coin);
+
+        return this.url + tick;
+    }
+
+    ticker(coin) {
+        if (coin === "BTC") {
+            return "BTCUSDT"
+        } else if (coin === "LTC") {
+            return "LTCUSDT"
+        } else if (coin === "ETH") {
+            return "ETHUSDT"
+        }
+    }
+
+    process_data(coin, data) {
+    this.coins[coin].binance = {
+            price: data.lastPrice
+        }
+    }
+}
+
+class CoinBase extends Exchange {
+    
+    ticker(coin) {
+        if (coin === "BTC") {
+            return "BTC-USD"
+        } else if (coin === "LTC") {
+            return "LTC-USD"
+        } else if (coin === "ETH") {
+            return "ETH-USD"
+        }
+    }
+
+    construct_query(coin) {
+        const tick = this.ticker(coin);
+
+        return this.url + tick + "/sell";
+    }
+
+    process_data(coin, data) {
+        this.coins[coin].coinbase = {
+                price: data.data.amount
+            }
+        }
+}
+
+const binance = new Binance("https://api.binance.com/api/v1/ticker/24hr?symbol=", coins);
+const coinbase = new CoinBase("https://api.coinbase.com/v2/prices/", coins);
 
 setInterval(
     () => {
         binance.get_price();
+        coinbase.get_price();
     },1000
 );
 
 setInterval(
     () => {
         generate_table(coins);
+        console.log(coins);
     },1000
 );
