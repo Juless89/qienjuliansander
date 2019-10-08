@@ -30,6 +30,8 @@ function generate_table(dict) {
     $('#tableDiv').html(table_body);
 }
 
+
+
 let coins = {
     BTC: {},
     LTC: {},
