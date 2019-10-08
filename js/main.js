@@ -1,3 +1,5 @@
+//import {genTable} from './js/genTable.js';
+
 function generate_table(dict) {
     var table_body = '<table class="table">';
     table_body +=   '<thead><tr><th scope="col">#</th><th scope="col">Ticker</th><th scope="col">Price</th></tr></thead>'
@@ -78,6 +80,16 @@ class Binance extends Exchange {
         }
     }
 
+    ticker_to_coin(ticker) {
+        if (ticker === "BTCUSDT") {
+            return "BTC"
+        } else if (ticker === "LTCUSDT") {
+            return "LTC"
+        } else if (ticker === "ETHUSDT") {
+            return "ETH"
+        }
+    }
+
     process_data(coin, data) {
     this.coins[coin].binance = {
             price: data.lastPrice,
@@ -86,7 +98,11 @@ class Binance extends Exchange {
     }
 
     process_websocket_data(exchange, data){
-        //console.log(data);
+        data = JSON.parse(data)
+        const price = parseFloat(data.data.c).toFixed(2);
+        const coin = this.ticker_to_coin(data.data.s);
+
+        $('#' +exchange+ '-' +coin).html(price);
     }
 }
 
@@ -126,10 +142,10 @@ class CoinBase extends Exchange {
 
     process_websocket_data(exchange, data){
         data = JSON.parse(data)
-        //console.log(data);
         const price = data.price;
-        const ticker = this.ticker_to_coin(data.product_id);
-        console.log(exchange, ticker, price);
+        const coin = this.ticker_to_coin(data.product_id);
+
+        $('#' +exchange+ '-' +coin).html(price);
     }
 }
 
@@ -142,6 +158,16 @@ class Bitstamp extends Exchange {
             return "ltcusd"
         } else if (coin === "ETH") {
             return "ethusd"
+        }
+    }
+
+    ticker_to_coin(ticker) {
+        if (ticker === "live_trades_btcusd") {
+            return "BTC"
+        } else if (ticker === "live_trades_ltcusd") {
+            return "LTC"
+        } else if (ticker === "live_trades_ethusd") {
+            return "ETH"
         }
     }
 
@@ -159,7 +185,13 @@ class Bitstamp extends Exchange {
     }
 
     process_websocket_data(exchange, data){
-        //console.log(data);
+        data = JSON.parse(data)
+
+        const price = data.data.price_str;
+        const coin = this.ticker_to_coin(data.channel);
+        console.log(exchange, price, coin);
+
+        $('#' +exchange+ '-' +coin).html(price);
     }
 }
 
