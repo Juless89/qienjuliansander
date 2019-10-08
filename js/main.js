@@ -1,3 +1,5 @@
+//import {genTable} from './js/genTable.js';
+
 function generate_table(dict) {
     var table_body = '<table class="table">';
     table_body +=   '<thead><tr><th scope="col">#</th><th scope="col">Ticker</th><th scope="col">Price</th></tr></thead>'
@@ -78,11 +80,29 @@ class Binance extends Exchange {
         }
     }
 
+    ticker_to_coin(ticker) {
+        if (ticker === "BTCUSDT") {
+            return "BTC"
+        } else if (ticker === "LTCUSDT") {
+            return "LTC"
+        } else if (ticker === "ETHUSDT") {
+            return "ETH"
+        }
+    }
+
     process_data(coin, data) {
     this.coins[coin].binance = {
             price: data.lastPrice,
             volume: data.volume,
         }
+    }
+
+    process_websocket_data(exchange, data){
+        data = JSON.parse(data)
+        const price = parseFloat(data.data.c).toFixed(2);
+        const coin = this.ticker_to_coin(data.data.s);
+
+        $('#' +exchange+ '-' +coin).html(price);
     }
 }
 
@@ -98,6 +118,16 @@ class CoinBase extends Exchange {
         }
     }
 
+    ticker_to_coin(ticker) {
+        if (ticker === "BTC-USD") {
+            return "BTC"
+        } else if (ticker === "LTC-USD") {
+            return "LTC"
+        } else if (ticker === "ETH-USD") {
+            return "ETH"
+        }
+    }
+
     construct_query(coin) {
         const tick = this.ticker(coin);
 
@@ -109,6 +139,14 @@ class CoinBase extends Exchange {
                 price: data.data.amount
             }
         }
+
+    process_websocket_data(exchange, data){
+        data = JSON.parse(data)
+        const price = data.price;
+        const coin = this.ticker_to_coin(data.product_id);
+
+        $('#' +exchange+ '-' +coin).html(price);
+    }
 }
 
 class Bitstamp extends Exchange {
@@ -123,6 +161,16 @@ class Bitstamp extends Exchange {
         }
     }
 
+    ticker_to_coin(ticker) {
+        if (ticker === "live_trades_btcusd") {
+            return "BTC"
+        } else if (ticker === "live_trades_ltcusd") {
+            return "LTC"
+        } else if (ticker === "live_trades_ethusd") {
+            return "ETH"
+        }
+    }
+
     construct_query(coin) {
         const tick = this.ticker(coin);
 
@@ -134,6 +182,16 @@ class Bitstamp extends Exchange {
             price: data.last,
             volume: data.volume
         }
+    }
+
+    process_websocket_data(exchange, data){
+        data = JSON.parse(data)
+
+        const price = data.data.price_str;
+        const coin = this.ticker_to_coin(data.channel);
+        console.log(exchange, price, coin);
+
+        $('#' +exchange+ '-' +coin).html(price);
     }
 }
 
@@ -157,8 +215,17 @@ setInterval(
 );
 
 function replyHandler(event) {
-    //console.log(event.data.exchange);
-    console.log(event.data);
+    const exchange = event.data.exchange;
+    const data = event.data.data;
+
+    if (exchange === "coinbase") {
+        coinbase.process_websocket_data(exchange, data);
+    } else if (exchange === "binance") {
+        binance.process_websocket_data(exchange, data);
+    } else if (exchange === "bitstamp") {
+        bitstamp.process_websocket_data(exchange, data);
+    }
+    //console.log(event.data);
     //alert("Reply: " + event.data);
 }
 

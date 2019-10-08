@@ -34,7 +34,7 @@ function genTable(){
     }
     table_body+='</table>';
 
-    $('#tableDiv').html(table_body);
+    $('#tableDiv2').html(table_body);
 }
 
 genTable();
