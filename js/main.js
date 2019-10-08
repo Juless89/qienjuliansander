@@ -84,6 +84,10 @@ class Binance extends Exchange {
             volume: data.volume,
         }
     }
+
+    process_websocket_data(exchange, data){
+        //console.log(data);
+    }
 }
 
 class CoinBase extends Exchange {
@@ -98,6 +102,16 @@ class CoinBase extends Exchange {
         }
     }
 
+    ticker_to_coin(ticker) {
+        if (ticker === "BTC-USD") {
+            return "BTC"
+        } else if (ticker === "LTC-USD") {
+            return "LTC"
+        } else if (ticker === "ETH-USD") {
+            return "ETH"
+        }
+    }
+
     construct_query(coin) {
         const tick = this.ticker(coin);
 
@@ -109,6 +123,14 @@ class CoinBase extends Exchange {
                 price: data.data.amount
             }
         }
+
+    process_websocket_data(exchange, data){
+        data = JSON.parse(data)
+        //console.log(data);
+        const price = data.price;
+        const ticker = this.ticker_to_coin(data.product_id);
+        console.log(exchange, ticker, price);
+    }
 }
 
 class Bitstamp extends Exchange {
@@ -135,6 +157,10 @@ class Bitstamp extends Exchange {
             volume: data.volume
         }
     }
+
+    process_websocket_data(exchange, data){
+        //console.log(data);
+    }
 }
 
 const binance = new Binance("https://api.binance.com/api/v1/ticker/24hr?symbol=", coins);
@@ -157,8 +183,17 @@ setInterval(
 );
 
 function replyHandler(event) {
-    //console.log(event.data.exchange);
-    console.log(event.data);
+    const exchange = event.data.exchange;
+    const data = event.data.data;
+
+    if (exchange === "coinbase") {
+        coinbase.process_websocket_data(exchange, data);
+    } else if (exchange === "binance") {
+        binance.process_websocket_data(exchange, data);
+    } else if (exchange === "bitstamp") {
+        bitstamp.process_websocket_data(exchange, data);
+    }
+    //console.log(event.data);
     //alert("Reply: " + event.data);
 }
 
