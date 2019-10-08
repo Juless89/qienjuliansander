@@ -4,15 +4,25 @@ function generate_table(dict) {
     table_body += '<tbody>';
     
     for(var i=0;i<Object.keys(dict).length;i++){
+
         const key = Object.keys(dict)[i];
+        let average_price = 0
+
+        const exchanges = Object.keys(dict[key])
+
+
+        for (var index in exchanges) {
+            average_price += dict[key][exchanges[index]].price;
+        }
+
+        average_price / exchanges.length;
+
         table_body+='<tr>';
-        //for(var j=0;j<this.x;j++){
             table_body += '<th scope="row">' + (i + 1) +'</th>';
             table_body +='<td class="field" id="' + key +'">';
             table_body += key;
             table_body +='</td>';
-            table_body += '<td>' + parseFloat(dict[key]).toFixed(2); + '</td>';
-        //}
+            table_body += '<td>' + parseFloat(average_price).toFixed(2); + '</td>';
         table_body+='</tr>';
     }
     table_body+='</table>';
@@ -68,7 +78,8 @@ class Binance extends Exchange {
 
     process_data(coin, data) {
     this.coins[coin].binance = {
-            price: data.lastPrice
+            price: data.lastPrice,
+            volume: data.volume,
         }
     }
 }
@@ -98,19 +109,47 @@ class CoinBase extends Exchange {
         }
 }
 
+class Bitstamp extends Exchange {
+    
+    ticker(coin) {
+        if (coin === "BTC") {
+            return "btcusd"
+        } else if (coin === "LTC") {
+            return "ltcusd"
+        } else if (coin === "ETH") {
+            return "ethusd"
+        }
+    }
+
+    construct_query(coin) {
+        const tick = this.ticker(coin);
+
+        return this.url + tick;
+    }
+
+    process_data(coin, data) {
+        this.coins[coin].bitstamp = {
+            price: data.last,
+            volume: data.volume
+        }
+    }
+}
+
 const binance = new Binance("https://api.binance.com/api/v1/ticker/24hr?symbol=", coins);
 const coinbase = new CoinBase("https://api.coinbase.com/v2/prices/", coins);
+const bitstamp = new Bitstamp("https://www.bitstamp.net/api/v2/ticker/", coins);
 
 setInterval(
     () => {
         binance.get_price();
         coinbase.get_price();
+        bitstamp.get_price();
     },1000
 );
 
 setInterval(
     () => {
         generate_table(coins);
-        console.log(coins);
+        //console.log(Object.entries(coins) );
     },1000
 );
