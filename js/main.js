@@ -145,6 +145,11 @@ class CoinBase extends Exchange {
         const price = data.price;
         const coin = this.ticker_to_coin(data.product_id);
 
+        const old_price = $('#' +exchange+ '-' +coin).html();
+
+        if (price >= old_price) {
+            document.getElementById(exchange+ '-' +coin).style.animation = "pulse 0.5s 0.2s";
+        }
         $('#' +exchange+ '-' +coin).html(price);
     }
 }
