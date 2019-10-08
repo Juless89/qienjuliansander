@@ -102,6 +102,14 @@ class Binance extends Exchange {
         const price = parseFloat(data.data.c).toFixed(2);
         const coin = this.ticker_to_coin(data.data.s);
 
+        const old_price = $('#' +exchange+ '-' +coin).html();
+        document.getElementById(exchange+ '-' +coin).style.animation = "";
+        if (price >= old_price) {
+            document.getElementById(exchange+ '-' +coin).style.animation = "greenpulse 0.1s 0.05s";
+        }
+        else if (price < old_price){
+            document.getElementById(exchange+ '-' +coin).style.animation = "redpulse 0.1s 0.05s";
+        }
         $('#' +exchange+ '-' +coin).html(price);
     }
 }
@@ -146,9 +154,12 @@ class CoinBase extends Exchange {
         const coin = this.ticker_to_coin(data.product_id);
 
         const old_price = $('#' +exchange+ '-' +coin).html();
-
+        document.getElementById(exchange+ '-' +coin).style.animation = "";
         if (price >= old_price) {
-            document.getElementById(exchange+ '-' +coin).style.animation = "pulse 0.5s 0.2s";
+            document.getElementById(exchange+ '-' +coin).style.animation = "greenpulse 0.1s 0.05s";
+        }
+        else if (price < old_price){
+            document.getElementById(exchange+ '-' +coin).style.animation = "redpulse 0.1s 0.05s";
         }
         $('#' +exchange+ '-' +coin).html(price);
     }
@@ -196,6 +207,14 @@ class Bitstamp extends Exchange {
         const coin = this.ticker_to_coin(data.channel);
         console.log(exchange, price, coin);
 
+        const old_price = $('#' +exchange+ '-' +coin).html();
+        document.getElementById(exchange+ '-' +coin).style.animation = "";
+        if (price >= old_price) {
+            document.getElementById(exchange+ '-' +coin).style.animation = "greenpulse 0.1s 0.05s";
+        }
+        else if (price < old_price){
+            document.getElementById(exchange+ '-' +coin).style.animation = "redpulse 0.1s 0.05s";
+        }
         $('#' +exchange+ '-' +coin).html(price);
     }
 }
