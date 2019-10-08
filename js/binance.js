@@ -4,7 +4,7 @@ function messageHandler(event) {
 self.addEventListener("message", messageHandler, false);
 
 
-const socket = new WebSocket('wss://stream.binance.com:9443/ws/bnbbtc@ticker')
+const socket = new WebSocket('wss://stream.binance.com:9443/stream?streams=btcusdt@ticker/ethusdt@ticker/ltcusdt@ticker')
 
 socket.onopen = function() {
     console.log ("Connection to server now open");

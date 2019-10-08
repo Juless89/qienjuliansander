@@ -167,6 +167,3 @@ const webWorker3 = new Worker("js\\binance.js");
 webWorker.addEventListener("message", replyHandler, false);
 webWorker2.addEventListener("message", replyHandler, false);
 webWorker3.addEventListener("message", replyHandler, false);
-//webWorker.postMessage("Here is some data");
-
-

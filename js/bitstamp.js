@@ -4,15 +4,33 @@ function messageHandler(event) {
 self.addEventListener("message", messageHandler, false);
 
 
-const socket = new WebSocket('wss://ws.bitstamp.net.')
+const socket = new WebSocket('wss://ws.bitstamp.net')
 
 socket.onopen = function() {
     console.log ("Connection to server now open");
 
-    const message = {
+    let message = {
         event: "bts:subscribe",
         data: {
             channel: "live_trades_btcusd"
+        }
+    }
+
+    socket.send(JSON.stringify(message))
+
+    message = {
+        event: "bts:subscribe",
+        data: {
+            channel: "live_trades_ethusd"
+        }
+    }
+
+    socket.send(JSON.stringify(message))
+
+    message = {
+        event: "bts:subscribe",
+        data: {
+            channel: "live_trades_ltcusd"
         }
     }
 

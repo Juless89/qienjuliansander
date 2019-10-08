@@ -17,7 +17,9 @@ socket.onopen = function() {
             {
                 name: "ticker",
                 product_ids: [
-                    "BTC-USD"
+                    "BTC-USD",
+                    "ETH-USD",
+                    "LTC-USD"
                 ]
             }
         ]
