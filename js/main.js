@@ -153,3 +153,20 @@ setInterval(
         //console.log(Object.entries(coins) );
     },1000
 );
+
+function replyHandler(event) {
+    //console.log(event.data.exchange);
+    console.log(event.data);
+    //alert("Reply: " + event.data);
+}
+
+const webWorker = new Worker("js\\coinbase.js");
+const webWorker2 = new Worker("js\\bitstamp.js");
+const webWorker3 = new Worker("js\\binance.js");
+
+webWorker.addEventListener("message", replyHandler, false);
+webWorker2.addEventListener("message", replyHandler, false);
+webWorker3.addEventListener("message", replyHandler, false);
+//webWorker.postMessage("Here is some data");
+
+
