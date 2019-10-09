@@ -1,4 +1,4 @@
-//import {genTable} from './js/genTable.js';
+//importScripts("genTable.js");
 
 function generate_table(dict) {
     var table_body = '<table class="table">';
@@ -99,6 +99,7 @@ class Binance extends Exchange {
 
     process_websocket_data(exchange, data){
         data = JSON.parse(data)
+        console.log(data);
         const price = parseFloat(data.data.c).toFixed(2);
         const coin = this.ticker_to_coin(data.data.s);
 
@@ -150,6 +151,7 @@ class CoinBase extends Exchange {
 
     process_websocket_data(exchange, data){
         data = JSON.parse(data)
+        console.log(data);
         const price = data.price;
         const coin = this.ticker_to_coin(data.product_id);
 
@@ -205,7 +207,7 @@ class Bitstamp extends Exchange {
 
         const price = data.data.price_str;
         const coin = this.ticker_to_coin(data.channel);
-        console.log(exchange, price, coin);
+        console.log(data);
 
         const old_price = $('#' +exchange+ '-' +coin).html();
         document.getElementById(exchange+ '-' +coin).style.animation = "";
